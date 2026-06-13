@@ -1,4 +1,7 @@
 #!/usr/bin/env node
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { join, dirname } from "node:path";
 import chalk from "chalk";
 import {
   getStagedDiff,
@@ -13,7 +16,10 @@ import { setConfigValue, getConfigValue, getConfigPath } from "./config.js";
 import { getRandomSpinnerMessage } from "./spinner.js";
 import * as ui from "./ui.js";
 
-const VERSION = "0.1.0";
+// read the version from package.json so we stop forgetting to bump this constant
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const pkg = JSON.parse(readFileSync(join(__dirname, "..", "package.json"), "utf-8"));
+const VERSION = pkg.version as string;
 
 const HELP_TEXT = `
 ${chalk.bold("honestcommit")} (${chalk.dim("hc")}) - say what you did, get a commit that sounds professional
