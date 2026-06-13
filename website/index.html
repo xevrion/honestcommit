@@ -5,9 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>honestcommit - say what you did, get a commit that lies professionally</title>
   <meta name="description" content="Type what you actually did in plain English. honestcommit turns it into a professional git commit message. Same diff, two completely different stories." />
+  <meta name="theme-color" content="#0d0d0d" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after {
       box-sizing: border-box;
@@ -15,15 +16,29 @@
       padding: 0;
     }
 
+    /* dark by default -- this is a terminal tool, it should look like one */
     :root {
-      --bg: #F9F7F4;
-      --text: #2D2B27;
-      --muted: #8C8980;
-      --accent: #1a1a1a;
-      --border: #E5E2DC;
-      --green: #3a7a3a;
-      --yellow: #b8860b;
-      --font: 'Geist Mono', 'Courier New', monospace;
+      --bg: #0d0d0d;
+      --surface: #161616;
+      --text: #ededed;
+      --muted: #6e6e6e;
+      --border: #2a2a2a;
+      --accent: #ff7a3d;
+      --accent-dim: #b85a2c;
+      --ok: #5fd97a;
+      --font: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+    }
+
+    /* light mode, for the brave */
+    [data-theme="light"] {
+      --bg: #faf9f7;
+      --surface: #ffffff;
+      --text: #1a1a1a;
+      --muted: #8a8a8a;
+      --border: #e6e3de;
+      --accent: #d9530a;
+      --accent-dim: #b8460a;
+      --ok: #2f8a45;
     }
 
     html, body {
@@ -31,25 +46,26 @@
       color: var(--text);
       font-family: var(--font);
       min-height: 100dvh;
+      transition: background 0.2s ease, color 0.2s ease;
     }
 
     body {
       display: grid;
       place-items: center;
-      padding: 2rem 1.5rem;
+      padding: 3rem 1.25rem;
     }
 
     main {
       width: 100%;
-      max-width: 600px;
+      max-width: 640px;
       display: flex;
       flex-direction: column;
-      gap: 2.5rem;
+      gap: 2.75rem;
     }
 
     /* Animations */
     @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(16px); }
+      from { opacity: 0; transform: translateY(14px); }
       to   { opacity: 1; transform: translateY(0); }
     }
 
@@ -57,14 +73,22 @@
       opacity: 0;
       animation: fadeUp 0.5s ease forwards;
     }
-    .anim-1 { animation-delay: 0.05s; }
-    .anim-2 { animation-delay: 0.15s; }
-    .anim-3 { animation-delay: 0.25s; }
-    .anim-4 { animation-delay: 0.35s; }
-    .anim-5 { animation-delay: 0.45s; }
-    .anim-6 { animation-delay: 0.55s; }
+    .anim-1 { animation-delay: 0.03s; }
+    .anim-2 { animation-delay: 0.1s; }
+    .anim-3 { animation-delay: 0.18s; }
+    .anim-4 { animation-delay: 0.26s; }
+    .anim-5 { animation-delay: 0.34s; }
+    .anim-6 { animation-delay: 0.42s; }
+    .anim-7 { animation-delay: 0.5s; }
 
-    /* Version badge */
+    /* Top bar: version + theme toggle */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
     .version {
       display: inline-flex;
       align-items: center;
@@ -77,93 +101,123 @@
       width: 6px;
       height: 6px;
       border-radius: 50%;
-      background: var(--green);
+      background: var(--ok);
       display: inline-block;
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--ok) 18%, transparent);
+    }
+
+    .theme-toggle {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-family: var(--font);
+      font-size: 0.7rem;
+      padding: 0.35rem 0.65rem;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    .theme-toggle:hover {
+      color: var(--text);
+      border-color: var(--accent);
     }
 
     /* Headline */
     .headline {
       display: flex;
       flex-direction: column;
-      gap: 0.35rem;
+      gap: 0.6rem;
     }
 
     .headline h1 {
-      font-size: clamp(1.6rem, 5vw, 2.2rem);
-      font-weight: 600;
-      line-height: 1.15;
+      font-size: clamp(1.75rem, 6vw, 2.6rem);
+      font-weight: 700;
+      line-height: 1.2;
       letter-spacing: -0.02em;
+    }
+
+    .headline h1 .accent {
       color: var(--accent);
     }
 
     .headline p {
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       color: var(--muted);
-      line-height: 1.5;
+      line-height: 1.6;
+      max-width: 46ch;
     }
 
     /* The contrast card -- this is the whole pitch */
     .contrast {
-      border: 1px dashed var(--border);
-      border-radius: 6px;
-      padding: 1.1rem 1.2rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem 1.35rem;
       display: flex;
       flex-direction: column;
-      gap: 0.65rem;
-      font-size: 0.82rem;
-      line-height: 1.6;
-      background: #fff;
+      gap: 0.75rem;
+      font-size: 0.85rem;
+      line-height: 1.7;
+      background: var(--surface);
     }
 
     .contrast-row {
       display: flex;
-      gap: 0.6rem;
-      align-items: baseline;
+      flex-direction: column;
+      gap: 0.2rem;
     }
 
     .contrast-label {
       color: var(--muted);
-      flex-shrink: 0;
-      white-space: nowrap;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
     }
 
     .contrast-said {
-      color: var(--yellow);
+      color: var(--text);
     }
 
     .contrast-sees {
-      color: var(--green);
+      color: var(--accent);
+    }
+
+    .contrast-arrow {
+      color: var(--border);
+      font-size: 0.8rem;
+      text-align: center;
+      line-height: 1;
     }
 
     .contrast-actions {
-      margin-top: 0.2rem;
-      padding-top: 0.65rem;
-      border-top: 1px dashed var(--border);
+      margin-top: 0.35rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--border);
       display: flex;
-      gap: 1rem;
+      gap: 1.1rem;
       flex-wrap: wrap;
       font-size: 0.75rem;
       color: var(--muted);
     }
 
     .contrast-actions span.use {
-      color: var(--text);
-      font-weight: 500;
+      color: var(--accent);
+      font-weight: 600;
     }
 
     /* Install command */
     .install-wrap {
       display: flex;
-      align-items: center;
-      gap: 0;
-      border: 1px dashed var(--border);
-      border-radius: 6px;
+      align-items: stretch;
+      border: 1px solid var(--border);
+      border-radius: 8px;
       overflow: hidden;
+      background: var(--surface);
     }
 
     .install-cmd {
       flex: 1;
-      padding: 0.75rem 1rem;
+      padding: 0.85rem 1.1rem;
       font-family: var(--font);
       font-size: 0.875rem;
       color: var(--text);
@@ -172,15 +226,19 @@
       outline: none;
       cursor: default;
       white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      overflow-x: auto;
+    }
+
+    .install-cmd::before {
+      content: '$ ';
+      color: var(--accent);
     }
 
     .copy-btn {
-      padding: 0.75rem 0.9rem;
+      padding: 0.85rem 1rem;
       background: transparent;
       border: none;
-      border-left: 1px dashed var(--border);
+      border-left: 1px solid var(--border);
       cursor: pointer;
       color: var(--muted);
       font-family: var(--font);
@@ -188,16 +246,17 @@
       display: flex;
       align-items: center;
       gap: 0.35rem;
-      transition: color 0.15s;
+      transition: color 0.15s, background 0.15s;
       white-space: nowrap;
     }
 
     .copy-btn:hover {
       color: var(--text);
+      background: color-mix(in srgb, var(--accent) 8%, transparent);
     }
 
     .copy-btn.copied {
-      color: var(--green);
+      color: var(--ok);
     }
 
     /* Nav links */
@@ -213,10 +272,12 @@
       color: var(--muted);
       text-decoration: none;
       transition: color 0.15s;
+      border-bottom: 1px solid transparent;
     }
 
     .nav a:hover {
-      color: var(--text);
+      color: var(--accent);
+      border-bottom-color: var(--accent);
     }
 
     .nav-sep {
@@ -225,91 +286,142 @@
       user-select: none;
     }
 
+    /* Section heading */
+    .section {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      border-top: 1px solid var(--border);
+      padding-top: 2rem;
+    }
+
+    .section-label {
+      font-size: 0.72rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
     /* Features */
     .features {
       display: flex;
       flex-direction: column;
-      gap: 0.5rem;
-      border-top: 1px dashed var(--border);
-      padding-top: 2rem;
+      gap: 0.6rem;
     }
 
     .feature {
       display: flex;
       align-items: baseline;
-      gap: 0.6rem;
-      font-size: 0.82rem;
+      gap: 0.65rem;
+      font-size: 0.85rem;
       color: var(--muted);
-      line-height: 1.4;
+      line-height: 1.5;
     }
 
     .feature-bullet {
-      color: var(--border);
+      color: var(--accent);
       flex-shrink: 0;
     }
 
     .feature strong {
       color: var(--text);
-      font-weight: 500;
+      font-weight: 600;
     }
 
     /* Examples */
     .examples {
       display: flex;
       flex-direction: column;
-      gap: 0.4rem;
-      border-top: 1px dashed var(--border);
-      padding-top: 2rem;
-    }
-
-    .examples-label {
-      font-size: 0.75rem;
-      color: var(--muted);
-      margin-bottom: 0.4rem;
+      gap: 0.5rem;
     }
 
     .example {
       font-size: 0.8rem;
       color: var(--text);
-      background: #fff;
-      border: 1px dashed var(--border);
+      background: var(--surface);
+      border: 1px solid var(--border);
       border-radius: 6px;
-      padding: 0.6rem 0.9rem;
+      padding: 0.7rem 1rem;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+
+    .example::before {
+      content: '$ ';
+      color: var(--accent);
     }
 
     footer {
       font-size: 0.75rem;
       color: var(--muted);
       text-align: center;
-      padding-top: 1rem;
+      padding-top: 1.5rem;
+      line-height: 1.7;
     }
 
     footer a {
       color: var(--muted);
       text-decoration: underline;
+      text-decoration-color: var(--border);
+    }
+
+    footer a:hover {
+      color: var(--accent);
+    }
+
+    /* Mobile tightening */
+    @media (max-width: 480px) {
+      body {
+        padding: 2rem 1rem;
+      }
+
+      main {
+        gap: 2.25rem;
+      }
+
+      .contrast {
+        padding: 1rem;
+        font-size: 0.8rem;
+      }
+
+      .install-cmd {
+        font-size: 0.8rem;
+      }
+
+      .copy-btn {
+        padding: 0.85rem 0.8rem;
+      }
+
+      .nav {
+        gap: 1rem;
+      }
     }
   </style>
 </head>
 <body>
   <main>
 
-    <div class="version anim anim-1">
-      <span class="version-dot"></span>
-      <span id="version">v0.1.0 is out</span>
+    <div class="topbar anim anim-1">
+      <div class="version">
+        <span class="version-dot"></span>
+        <span id="version">v0.1.1 is out</span>
+      </div>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">light mode</button>
     </div>
 
     <div class="headline anim anim-2">
-      <h1>git log is a lie.<br/>at least make it a good one.</h1>
-      <p>Type what you actually did in plain English.<br/>Get a commit message that sounds like a senior engineer wrote it.</p>
+      <h1>git log is a lie.<br/>at least make it a <span class="accent">good</span> one.</h1>
+      <p>Type what you actually did, in plain English. Get a commit message that sounds like a senior engineer wrote it. Same diff, two completely different stories.</p>
     </div>
 
     <div class="contrast anim anim-3">
       <div class="contrast-row">
-        <span class="contrast-label">✦ what you said:</span>
+        <span class="contrast-label">what you said</span>
         <span class="contrast-said">"moved one div and somehow fixed everything"</span>
       </div>
+      <div class="contrast-arrow">↓</div>
       <div class="contrast-row">
-        <span class="contrast-label">✦ what git sees:</span>
+        <span class="contrast-label">what git sees</span>
         <span class="contrast-sees">"fix: resolve layout rendering inconsistency in component hierarchy"</span>
       </div>
       <div class="contrast-actions">
@@ -328,27 +440,32 @@
     </div>
 
     <nav class="nav anim anim-5">
-      <a href="https://github.com/xevrion/honestcommit" target="_blank" rel="noopener">[github]</a>
+      <a href="https://github.com/xevrion/honestcommit" target="_blank" rel="noopener">github</a>
       <span class="nav-sep">/</span>
-      <a href="https://www.npmjs.com/package/honestcommit" target="_blank" rel="noopener">[npm]</a>
+      <a href="https://www.npmjs.com/package/honestcommit" target="_blank" rel="noopener">npm</a>
       <span class="nav-sep">/</span>
-      <a href="https://github.com/xevrion/honestcommit/issues" target="_blank" rel="noopener">[issues]</a>
+      <a href="https://github.com/xevrion/honestcommit/issues" target="_blank" rel="noopener">issues</a>
     </nav>
 
-    <div class="features anim anim-6">
-      <div class="feature"><span class="feature-bullet">-</span><span><strong>git add .</strong> then <strong>hc "whatever you actually did"</strong>: that's it</span></div>
-      <div class="feature"><span class="feature-bullet">-</span><span><strong>Secretly reads your diff</strong>: even a vague message gets a good result</span></div>
-      <div class="feature"><span class="feature-bullet">-</span><span><strong>hc -g 3</strong>: generate multiple options and pick your favorite lie</span></div>
-      <div class="feature"><span class="feature-bullet">-</span><span><strong>--type conventional</strong>: feat:/fix:/chore: for the spec-following crowd</span></div>
-      <div class="feature"><span class="feature-bullet">-</span><span><strong>Review before commit</strong>: Use as-is, Regenerate, Edit, or Cancel</span></div>
-      <div class="feature"><span class="feature-bullet">-</span><span><strong>--dry-run</strong>: see the lie without committing to it</span></div>
+    <div class="section anim anim-6">
+      <div class="section-label">how it works</div>
+      <div class="features">
+        <div class="feature"><span class="feature-bullet">→</span><span><strong>git add .</strong> then <strong>hc "whatever you actually did"</strong>, that's the whole workflow</span></div>
+        <div class="feature"><span class="feature-bullet">→</span><span><strong>Secretly reads your diff</strong>, even a vague message gets a good result</span></div>
+        <div class="feature"><span class="feature-bullet">→</span><span><strong>hc -g 3</strong> generates multiple options, pick your favorite lie</span></div>
+        <div class="feature"><span class="feature-bullet">→</span><span><strong>--type conventional</strong> gives you feat:/fix:/chore: for the spec-following crowd</span></div>
+        <div class="feature"><span class="feature-bullet">→</span><span><strong>Review before commit</strong>: Use as-is, Regenerate, Edit, or Cancel</span></div>
+        <div class="feature"><span class="feature-bullet">→</span><span><strong>--dry-run</strong> shows the lie without committing to it</span></div>
+      </div>
     </div>
 
-    <div class="examples anim anim-6">
-      <div class="examples-label">things people have actually typed:</div>
-      <div class="example">hc "no idea why this works but the tests pass now"</div>
-      <div class="example">hc "copy pasted from stackoverflow, deal with it"</div>
-      <div class="example">hc "deleted the thing that was breaking everything, sorry future me"</div>
+    <div class="section anim anim-7">
+      <div class="section-label">things people have actually typed</div>
+      <div class="examples">
+        <div class="example">hc "no idea why this works but the tests pass now"</div>
+        <div class="example">hc "copy pasted from stackoverflow, deal with it"</div>
+        <div class="example">hc "deleted the thing that was breaking everything, sorry future me"</div>
+      </div>
     </div>
 
     <footer>
@@ -374,6 +491,30 @@
       } catch {
         icon.textContent = 'copy';
       }
+    });
+
+    // theme toggle, defaults to dark, remembers your choice
+    const themeToggle = document.getElementById('themeToggle');
+    const root = document.documentElement;
+
+    function applyTheme(theme) {
+      if (theme === 'light') {
+        root.setAttribute('data-theme', 'light');
+        themeToggle.textContent = 'dark mode';
+      } else {
+        root.removeAttribute('data-theme');
+        themeToggle.textContent = 'light mode';
+      }
+    }
+
+    const saved = localStorage.getItem('hc-theme');
+    if (saved) applyTheme(saved);
+
+    themeToggle.addEventListener('click', () => {
+      const isLight = root.getAttribute('data-theme') === 'light';
+      const next = isLight ? 'dark' : 'light';
+      applyTheme(next);
+      localStorage.setItem('hc-theme', next);
     });
   </script>
 </body>

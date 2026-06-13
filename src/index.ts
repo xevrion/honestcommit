@@ -24,10 +24,12 @@ ${chalk.bold("USAGE")}
 
 ${chalk.bold("OPTIONS")}
   -g, --generate <n>                   generate <n> options and pick one
-  -t, --type <style>                   "conventional" for Conventional Commits format
+  -t, --type <style>                   "conventional" for stricter spec (adds scopes)
   -d, --dry-run                        print the message, don't commit anything
   -v, --version                        print the version
   -h, --help                           print this message
+
+${chalk.dim("note: commits already use feat:/fix:/chore: etc by default")}
 
 ${chalk.bold("CONFIG")}
   hc config set GROQ_API_KEY=<key>     save your groq api key

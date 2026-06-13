@@ -75,9 +75,9 @@ hc "added a console.log, found the bug, forgot to remove the console.log, remove
 ### options
 
 ```bash
-hc "your honest message"        # the main thing
+hc "your honest message"        # the main thing (already feat:/fix:/chore: by default)
 hc -g 3 "fixed some stuff"       # generate 3 options, pick your favorite
-hc --type conventional "..."     # feat:/fix:/chore: etc, for the Conventional Commits crowd
+hc --type conventional "..."     # stricter Conventional Commits, adds scopes like fix(auth):
 hc --dry-run "..."                # just show the lie, don't commit it
 ```
 

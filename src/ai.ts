@@ -23,12 +23,16 @@ export interface GenerateOptions {
   count: number;
 }
 
-const BASE_SYSTEM_PROMPT = `You are a git commit message generator. The user will give you their honest, casual description of what they did, plus the git diff of their staged changes for context. You will return ONLY a single professional git commit message, no explanation, no preamble, no quotes, just the message. Make it sound like a competent senior engineer wrote it. Keep it under 72 characters.`;
+const BASE_SYSTEM_PROMPT = `You are a git commit message generator. The user will give you their honest, casual description of what they did, plus the git diff of their staged changes for context. You will return ONLY a single professional git commit message, no explanation, no preamble, no quotes, just the message. Make it sound like a competent senior engineer wrote it.
 
-const CONVENTIONAL_ADDENDUM = `\n\nFollow the Conventional Commits spec strictly (feat:, fix:, chore:, refactor:, docs:, style:, test:, perf:, build:, ci:, etc). Pick the most accurate type based on the diff, not just the user's wording.`;
+Always prefix the message with a Conventional Commits type (feat:, fix:, chore:, refactor:, docs:, style:, test:, perf:, build:, ci:) based on what the diff actually shows, not just the user's wording. Use "feat" for new functionality, "fix" for bug fixes, "refactor" for restructuring without behavior change, "style" for formatting/visual-only changes, "chore" for maintenance/config, "docs" for documentation, "test" for tests.
+
+Keep the whole message (including the prefix) under 72 characters. Use the imperative mood (e.g. "add", "fix", "redesign", not "added" or "fixes").`;
+
+const CONVENTIONAL_STRICT_ADDENDUM = `\n\nFollow the Conventional Commits spec strictly, including an optional scope in parentheses when it adds clarity (e.g. fix(auth): ...).`;
 
 function buildSystemPrompt(conventional: boolean): string {
-  return conventional ? BASE_SYSTEM_PROMPT + CONVENTIONAL_ADDENDUM : BASE_SYSTEM_PROMPT;
+  return conventional ? BASE_SYSTEM_PROMPT + CONVENTIONAL_STRICT_ADDENDUM : BASE_SYSTEM_PROMPT;
 }
 
 function buildUserPrompt(honestMessage: string, diff: string): string {
@@ -48,14 +52,37 @@ function buildUserPrompt(honestMessage: string, diff: string): string {
   return prompt;
 }
 
+const CONVENTIONAL_TYPES = [
+  "feat",
+  "fix",
+  "chore",
+  "refactor",
+  "docs",
+  "style",
+  "test",
+  "perf",
+  "build",
+  "ci",
+];
+
 function cleanMessage(raw: string): string {
   // models love wrapping things in quotes even when you beg them not to
-  return raw
+  let message = raw
     .trim()
     .replace(/^["'`]+/, "")
     .replace(/["'`]+$/, "")
     .split("\n")[0]
     .trim();
+
+  // sometimes the model forgets the colon after the conventional commit type
+  // (e.g. "refactor stylesheet" instead of "refactor: stylesheet")
+  const typeMatch = message.match(/^(\w+)(\([^)]+\))?\s+(?!:)(.+)/);
+  if (typeMatch && CONVENTIONAL_TYPES.includes(typeMatch[1].toLowerCase())) {
+    const scope = typeMatch[2] ?? "";
+    message = `${typeMatch[1]}${scope}: ${typeMatch[3]}`;
+  }
+
+  return message;
 }
 
 let client: Groq | null = null;
