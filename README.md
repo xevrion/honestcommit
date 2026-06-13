@@ -15,7 +15,7 @@ You type the truth. It types the lie your team lead wants to read.
 
 Same change. Same diff. Two completely different stories. That's the whole product.
 
-## why
+## why?
 
 Because `git log` is a lie and we all know it.
 
