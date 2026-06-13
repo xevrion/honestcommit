@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>honestcommit — say what you did, get a commit that lies professionally</title>
+  <meta name="description" content="Type what you actually did in plain English. honestcommit turns it into a professional git commit message. Same diff, two completely different stories." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #F9F7F4;
+      --text: #2D2B27;
+      --muted: #8C8980;
+      --accent: #1a1a1a;
+      --border: #E5E2DC;
+      --green: #3a7a3a;
+      --yellow: #b8860b;
+      --font: 'Geist Mono', 'Courier New', monospace;
+    }
+
+    html, body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      min-height: 100dvh;
+    }
+
+    body {
+      display: grid;
+      place-items: center;
+      padding: 2rem 1.5rem;
+    }
+
+    main {
+      width: 100%;
+      max-width: 600px;
+      display: flex;
+      flex-direction: column;
+      gap: 2.5rem;
+    }
+
+    /* Animations */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .anim {
+      opacity: 0;
+      animation: fadeUp 0.5s ease forwards;
+    }
+    .anim-1 { animation-delay: 0.05s; }
+    .anim-2 { animation-delay: 0.15s; }
+    .anim-3 { animation-delay: 0.25s; }
+    .anim-4 { animation-delay: 0.35s; }
+    .anim-5 { animation-delay: 0.45s; }
+    .anim-6 { animation-delay: 0.55s; }
+
+    /* Version badge */
+    .version {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .version-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      display: inline-block;
+    }
+
+    /* Headline */
+    .headline {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .headline h1 {
+      font-size: clamp(1.6rem, 5vw, 2.2rem);
+      font-weight: 600;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      color: var(--accent);
+    }
+
+    .headline p {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* The contrast card -- this is the whole pitch */
+    .contrast {
+      border: 1px dashed var(--border);
+      border-radius: 6px;
+      padding: 1.1rem 1.2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      font-size: 0.82rem;
+      line-height: 1.6;
+      background: #fff;
+    }
+
+    .contrast-row {
+      display: flex;
+      gap: 0.6rem;
+      align-items: baseline;
+    }
+
+    .contrast-label {
+      color: var(--muted);
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+
+    .contrast-said {
+      color: var(--yellow);
+    }
+
+    .contrast-sees {
+      color: var(--green);
+    }
+
+    .contrast-actions {
+      margin-top: 0.2rem;
+      padding-top: 0.65rem;
+      border-top: 1px dashed var(--border);
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .contrast-actions span.use {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    /* Install command */
+    .install-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      border: 1px dashed var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .install-cmd {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      font-family: var(--font);
+      font-size: 0.875rem;
+      color: var(--text);
+      background: transparent;
+      border: none;
+      outline: none;
+      cursor: default;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .copy-btn {
+      padding: 0.75rem 0.9rem;
+      background: transparent;
+      border: none;
+      border-left: 1px dashed var(--border);
+      cursor: pointer;
+      color: var(--muted);
+      font-family: var(--font);
+      font-size: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      transition: color 0.15s;
+      white-space: nowrap;
+    }
+
+    .copy-btn:hover {
+      color: var(--text);
+    }
+
+    .copy-btn.copied {
+      color: var(--green);
+    }
+
+    /* Nav links */
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+    }
+
+    .nav a {
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    .nav a:hover {
+      color: var(--text);
+    }
+
+    .nav-sep {
+      color: var(--border);
+      font-size: 0.8rem;
+      user-select: none;
+    }
+
+    /* Features */
+    .features {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      border-top: 1px dashed var(--border);
+      padding-top: 2rem;
+    }
+
+    .feature {
+      display: flex;
+      align-items: baseline;
+      gap: 0.6rem;
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .feature-bullet {
+      color: var(--border);
+      flex-shrink: 0;
+    }
+
+    .feature strong {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    /* Examples */
+    .examples {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      border-top: 1px dashed var(--border);
+      padding-top: 2rem;
+    }
+
+    .examples-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-bottom: 0.4rem;
+    }
+
+    .example {
+      font-size: 0.8rem;
+      color: var(--text);
+      background: #fff;
+      border: 1px dashed var(--border);
+      border-radius: 6px;
+      padding: 0.6rem 0.9rem;
+    }
+
+    footer {
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-align: center;
+      padding-top: 1rem;
+    }
+
+    footer a {
+      color: var(--muted);
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <main>
+
+    <div class="version anim anim-1">
+      <span class="version-dot"></span>
+      <span id="version">v0.1.0 is out</span>
+    </div>
+
+    <div class="headline anim anim-2">
+      <h1>git log is a lie.<br/>at least make it a good one.</h1>
+      <p>Type what you actually did in plain English.<br/>Get a commit message that sounds like a senior engineer wrote it.</p>
+    </div>
+
+    <div class="contrast anim anim-3">
+      <div class="contrast-row">
+        <span class="contrast-label">✦ what you said:</span>
+        <span class="contrast-said">"moved one div and somehow fixed everything"</span>
+      </div>
+      <div class="contrast-row">
+        <span class="contrast-label">✦ what git sees:</span>
+        <span class="contrast-sees">"fix: resolve layout rendering inconsistency in component hierarchy"</span>
+      </div>
+      <div class="contrast-actions">
+        <span class="use">→ Use as-is</span>
+        <span>Regenerate</span>
+        <span>Edit</span>
+        <span>Cancel</span>
+      </div>
+    </div>
+
+    <div class="install-wrap anim anim-4">
+      <span class="install-cmd">npm install -g honestcommit</span>
+      <button class="copy-btn" id="copyBtn" aria-label="Copy install command">
+        <span id="copyIcon">copy</span>
+      </button>
+    </div>
+
+    <nav class="nav anim anim-5">
+      <a href="https://github.com/xevrion/honestcommit" target="_blank" rel="noopener">[github]</a>
+      <span class="nav-sep">/</span>
+      <a href="https://www.npmjs.com/package/honestcommit" target="_blank" rel="noopener">[npm]</a>
+      <span class="nav-sep">/</span>
+      <a href="https://github.com/xevrion/honestcommit/issues" target="_blank" rel="noopener">[issues]</a>
+    </nav>
+
+    <div class="features anim anim-6">
+      <div class="feature"><span class="feature-bullet">—</span><span><strong>git add .</strong> then <strong>hc "whatever you actually did"</strong> — that's it</span></div>
+      <div class="feature"><span class="feature-bullet">—</span><span><strong>Secretly reads your diff</strong> — even a vague message gets a good result</span></div>
+      <div class="feature"><span class="feature-bullet">—</span><span><strong>hc -g 3</strong> — generate multiple options and pick your favorite lie</span></div>
+      <div class="feature"><span class="feature-bullet">—</span><span><strong>--type conventional</strong> — feat:/fix:/chore: for the spec-following crowd</span></div>
+      <div class="feature"><span class="feature-bullet">—</span><span><strong>Review before commit</strong> — Use as-is, Regenerate, Edit, or Cancel</span></div>
+      <div class="feature"><span class="feature-bullet">—</span><span><strong>--dry-run</strong> — see the lie without committing to it</span></div>
+    </div>
+
+    <div class="examples anim anim-6">
+      <div class="examples-label">things people have actually typed:</div>
+      <div class="example">hc "no idea why this works but the tests pass now"</div>
+      <div class="example">hc "copy pasted from stackoverflow, deal with it"</div>
+      <div class="example">hc "deleted the thing that was breaking everything, sorry future me"</div>
+    </div>
+
+    <footer>
+      MIT licensed. Powered by Groq + llama-3.3-70b. Built on a Saturday.<br/>
+      <a href="https://github.com/xevrion/honestcommit" target="_blank" rel="noopener">source on github</a>
+    </footer>
+
+  </main>
+
+  <script>
+    const btn = document.getElementById('copyBtn');
+    const icon = document.getElementById('copyIcon');
+
+    btn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText('npm install -g honestcommit');
+        icon.textContent = 'copied ✓';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          icon.textContent = 'copy';
+          btn.classList.remove('copied');
+        }, 2000);
+      } catch {
+        icon.textContent = 'copy';
+      }
+    });
+  </script>
+</body>
+</html>
