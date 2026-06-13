@@ -1,6 +1,6 @@
 {
   "name": "honestcommit",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Type what you actually did. Get a commit message that lies about it professionally.",
   "license": "MIT",
   "type": "module",
