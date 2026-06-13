@@ -1,8 +1,8 @@
 # honestcommit
 
-[![npm version](https://img.shields.io/npm/v/honestcommit.svg)](https://www.npmjs.com/package/honestcommit)
-[![license](https://img.shields.io/npm/l/honestcommit.svg)](./LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/xevrion/honestcommit.svg?style=social)](https://github.com/xevrion/honestcommit)
+[![npm version](https://img.shields.io/npm/v/honestcommit)](https://www.npmjs.com/package/honestcommit)
+[![license](https://img.shields.io/npm/l/honestcommit)](./LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/xevrion/honestcommit)](https://github.com/xevrion/honestcommit)
 
 You type the truth. It types the lie your team lead wants to read.
 
