@@ -99,10 +99,10 @@ hc --help
 
 After generating, you get four options:
 
-- **Use as-is** — commit it, move on with your life
-- **Regenerate** — ask the robot to lie better
-- **Edit** — you know better than the AI (sometimes)
-- **Cancel** — chicken out, nothing is committed
+- **Use as-is**: commit it, move on with your life
+- **Regenerate**: ask the robot to lie better
+- **Edit**: you know better than the AI (sometimes)
+- **Cancel**: chicken out, nothing is committed
 
 Nothing ever gets committed without you seeing it first. honestcommit will
 make you sound competent, but it won't do it *behind your back*.

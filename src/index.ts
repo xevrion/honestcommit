@@ -16,7 +16,7 @@ import * as ui from "./ui.js";
 const VERSION = "0.1.0";
 
 const HELP_TEXT = `
-${chalk.bold("honestcommit")} (${chalk.dim("hc")}) — say what you did, get a commit that sounds professional
+${chalk.bold("honestcommit")} (${chalk.dim("hc")}) - say what you did, get a commit that sounds professional
 
 ${chalk.bold("USAGE")}
   hc "<your honest message>"          turn your honest message into a real commit
@@ -65,7 +65,7 @@ function parseArgs(argv: string[]): ParsedArgs {
     configCommand: null,
   };
 
-  // `hc config set KEY=VALUE` / `hc config get KEY` — handled separately,
+  // `hc config set KEY=VALUE` / `hc config get KEY` are handled separately,
   // grab everything after "config" verbatim
   if (args[0] === "config") {
     result.configCommand = args.slice(1);
@@ -206,7 +206,7 @@ async function main(): Promise<void> {
   }
 
   if (!(await hasStagedChanges())) {
-    ui.log.error("nothing staged. run `git add` first — that part's still on you.");
+    ui.log.error("nothing staged. run `git add` first, that part's still on you.");
     ui.outro(chalk.red("aborted"));
     process.exitCode = 1;
     return;

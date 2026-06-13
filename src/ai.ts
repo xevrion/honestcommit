@@ -23,7 +23,7 @@ export interface GenerateOptions {
   count: number;
 }
 
-const BASE_SYSTEM_PROMPT = `You are a git commit message generator. The user will give you their honest, casual description of what they did, plus the git diff of their staged changes for context. You will return ONLY a single professional git commit message — no explanation, no preamble, no quotes, just the message. Make it sound like a competent senior engineer wrote it. Keep it under 72 characters.`;
+const BASE_SYSTEM_PROMPT = `You are a git commit message generator. The user will give you their honest, casual description of what they did, plus the git diff of their staged changes for context. You will return ONLY a single professional git commit message, no explanation, no preamble, no quotes, just the message. Make it sound like a competent senior engineer wrote it. Keep it under 72 characters.`;
 
 const CONVENTIONAL_ADDENDUM = `\n\nFollow the Conventional Commits spec strictly (feat:, fix:, chore:, refactor:, docs:, style:, test:, perf:, build:, ci:, etc). Pick the most accurate type based on the diff, not just the user's wording.`;
 
