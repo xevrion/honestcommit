@@ -1,0 +1,42 @@
+{
+  "name": "honestcommit",
+  "version": "0.1.0",
+  "description": "Type what you actually did. Get a commit message that lies about it professionally.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "honestcommit": "./dist/index.js",
+    "hc": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "git",
+    "commit",
+    "cli",
+    "ai",
+    "groq",
+    "commit-message"
+  ],
+  "author": "",
+  "dependencies": {
+    "@clack/prompts": "^0.7.0",
+    "chalk": "^5.3.0",
+    "conf": "^12.0.0",
+    "execa": "^8.0.1",
+    "groq-sdk": "^0.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "typescript": "^5.4.0"
+  }
+}
