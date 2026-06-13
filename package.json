@@ -1,12 +1,12 @@
 {
   "name": "honestcommit",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Type what you actually did. Get a commit message that lies about it professionally.",
   "license": "MIT",
   "type": "module",
   "bin": {
-    "honestcommit": "./dist/index.js",
-    "hc": "./dist/index.js"
+    "honestcommit": "dist/index.js",
+    "hc": "dist/index.js"
   },
   "files": [
     "dist"
